@@ -1,0 +1,5 @@
+vvvenv_nutri/*
+/.envs
+__pycache__/
+*.pyc
+.vscode/*
