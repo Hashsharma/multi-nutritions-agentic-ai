@@ -1,0 +1,1007 @@
+16 in 1 Universal Multi Sockets Tower Extension Boards
+
+
+*"I’m a Senior Software Engineer specializing in Generative AI, with experience across multiple domains including Healthcare Information Systems, EdTech, TechScraping, and Banking. In my roles, I’ve not only handled software development tasks like change requests and client support but also collaborated closely with clients to understand their business perspective and translate that into technical solutions.
+
+I’ve had the opportunity to lead projects from scratch, such as TechScraping—where I implemented RAG-based techniques for efficient data retrieval—and data scraping solutions, as well as EdTech platforms, including HIS system architecture using multi-agent systems. I enjoy blending technical problem-solving with business understanding, building scalable solutions, and exploring how AI can drive value across different industries."*
+
+temparature defines deterministic to randomness other term probabilistic
+Deterministic: “Always pick the best answer.”
+Probabilistic: “Pick an answer based on weighted randomness.”
+Temperature controls the degree of randomness (entropy) in sampling from a probabilistic model, shifting behavior from more deterministic-like to more stochastic.
+
+india
+
+LangChain is a framework that helps developers build applications using large language models (LLMs) by chaining components like prompts, memory, tools, and data sources.
+
+
+Interviews Programs
+
+Autoregressive models cannot generate all tokens at once, unlike non-autoregressive models.
+KV caching helps speed up autoregressive generation by storing previous computations.
+
+Multi-head attention allows the model to look at different “aspects” or “representations” of the sequence simultaneously by using multiple attention “heads”.
+Multi-head = multiple perspectives on the same input.
+Attention per head = normal attention (Q,K,V).
+Output = richer feature representation.
+
+Top-k limits the number of tokens we consider when sampling the next token, so the model only looks at the k most likely tokens according to its predicted probability distribution.
+
+A token is the smallest unit of text that a model processes. Usually, tokens are words, subwords, or characters depending on the tokenizer.
+
+Data gaps
+
+LLMs are trained on vast corpora, but they don’t have real-time access to facts beyond their knowledge cutoff. If asked about very recent events or obscure facts, they have no factual reference and may “hallucinate.”
+
+You want tokenization that captures meaningful units of language (semantic meaning) without creating unnecessarily long sequences, because:
+
+Too few tokens (like word-level with rare words) → OOV issues, poor understanding → hurts model performance.
+Too many tokens (like character-level or over-splitting) → sequences are long → attention and compute cost grow → slower and more expensive.
+
+BPE (Byte Pair Encoding)
+
+
+Multi-hop reasoning in Retrieval-Augmented Generation (RAG) refers to answering questions that require combining information from multiple retrieved pieces of evidence rather than relying on a single document chunk.
+
+Single-hop retrieval looks up one piece of information and answers directly.
+Multi-hop retrieval chains multiple retrievals, each depending on the previous result, to answer questions requiring reasoning across multiple sources.
+it’s like solving a puzzle in steps instead of in one shot. Kind a prompt chaining to retrieve the multiple information from different KB's.
+
+chunk_size=1000:
+
+it first tries paragraphs
+if a paragraph exceeds 1000 chars → split by lines
+if lines still exceed → split by spaces
+if words still exceed → split by characters
+
+
+3. Document-aware chunking
+Uses actual document structure.
+
+Examples:
+
+headings
+sections
+tables
+bullet lists
+code blocks
+markdown hierarchy
+HTML DOM
+PDFs layout
+slide boundaries
+
+
+Q12
+
+How would you chunk:
+
+source code
+tables
+PDFs
+markdown docs
+chat conversations
+transcripts
+
+
+retrieval quality is poor
+bad embeddings
+bad chunking
+bad reranking
+bad prompting
+
+
+| Method         | How it splits                      |
+| -------------- | ---------------------------------- |
+| Fixed          | Every N chars/tokens               |
+| Recursive      | Paragraphs → lines → words         |
+| Semantic       | Topic similarity                   |
+| Document-aware | Headings/layout                    |
+| Agentic        | LLM decides boundaries dynamically |
+
+
+Semantic chunking decides where to split.
+Contextual chunking decides what extra context to add to each chunk after splitting.
+
+
+4. Response Generation
+Intent Detection
+Planning
+Grounding
+Formatting Layer
+Safety & Validation
+
+
+A Realistic Runtime Pipeline
+
+A production chatbot often looks like this:
+
+User Message
+    |
+Intent Classification
+    |
+Memory Retrieval
+    |
+RAG / Search
+    |
+Prompt Assembly
+    |
+LLM Reasoning
+    |
+Tool Calls (optional loop)
+    |
+Validation / Safety
+    |
+Formatting
+    |
+Final Response
+
+
+Groundedness becomes lower when the model adds information that is not supported by the retrieved context, even if the added information is true.
+
+Retrieved context:
+
+“NVIDIA released NeMo for enterprise AI applications.”
+
+Generated answer:
+
+“NVIDIA released NeMo for enterprise AI applications. It became one of the most revolutionary AI frameworks in history.”
+
+Faithfulness: whether the meaning of the generated answer stays consistent with the retrieved context.
+Example 1 — Faithful Without Same Keywords
+
+Context:
+
+“NVIDIA introduced NeMo in 2023.”
+
+Answer:
+
+“NeMo was launched by NVIDIA in 2023.”
+
+Keywords changed:
+
+introduced → launched
+
+But meaning is preserved.
+
+→ Faithful = HIGH
+
+90
+
+Multi-Turn Conversation
+A multi-turn conversation is a dialogue where the interaction happens across multiple back-and-forth exchanges, and the system remembers earlier context to respond correctly.
+
+I’d handle multi-turn conversations using a layered memory architecture: recent chat history for immediate context, summarized history for scalability, and retrieval-based long-term memory using embeddings and a vector database. Before each response, I’d retrieve only the most relevant memories and combine them with recent turns to stay within token limits. I’d also classify memories by importance, avoid storing sensitive data, and periodically summarize old conversations to reduce cost and latency while maintaining coherence.
+
+
+I’d reduce hallucinations primarily by grounding the chatbot using Retrieval-Augmented Generation, where responses are generated from trusted retrieved documents instead of only model memory. I’d also use strong system prompts, confidence thresholds, structured outputs, and validation layers to prevent fabricated responses. For high-risk domains, I’d add human review and external verification systems.
+
+
+What “quality” means
+
+Chatbot quality is not one metric. It usually includes:
+
+Correctness (factually right)
+Relevance (answers the question)
+Coherence (well-structured, readable)
+Groundedness (supported by sources / retrieval)
+Helpfulness (solves user problem)
+Safety (no harmful or policy-violating content)
+Efficiency (not too long, not too verbose)
+
+Different applications weight these differently.
+
+
+prompt chaining does add latency, but with parallelization, caching, and model choice, you can often keep it low enough for real-time chatbot systems.
+
+| Metric                     | Most Common Framework   |
+| -------------------------- | ----------------------- |
+| Semantic Similarity        | BERTScore               |
+| Faithfulness               | Ragas                   |
+| Groundedness               | DeepEval / TruLens      |
+| LLM-as-a-Judge             | DeepEval / OpenAI Evals |
+| ROUGE/BLEU                 | HuggingFace Evaluate    |
+| Retrieval Precision/Recall | Ragas / Haystack        |
+
+
+
+| Framework / Library                                                                                                          | Mainly Used For                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| [Ragas](https://docs.ragas.io/en/latest/?utm_source=chatgpt.com)                                                             | Faithfulness, Context Precision, Context Recall, Answer Relevancy |
+| [DeepEval](https://docs.confident-ai.com/docs/metrics-introduction?utm_source=chatgpt.com)                                   | Groundedness, Hallucination Detection, LLM-as-a-Judge             |
+| [BERTScore](https://github.com/Tiiiger/bert_score?utm_source=chatgpt.com)                                                    | Semantic Similarity                                               |
+| [HuggingFace Evaluate](https://huggingface.co/docs/evaluate/index?utm_source=chatgpt.com)                                    | ROUGE, BLEU, BERTScore evaluation                                 |
+| [LangChain Evaluation](https://python.langchain.com/docs/concepts/evaluation/?utm_source=chatgpt.com)                        | End-to-end LLM/RAG evaluation pipelines                           |
+| [Haystack Evaluation](https://docs.haystack.deepset.ai/docs/evaluation?utm_source=chatgpt.com)                               | Retriever evaluation and QA benchmarking                          |
+| [TruLens](https://www.trulens.org/?utm_source=chatgpt.com)                                                                   | RAG observability, feedback scoring, groundedness                 |
+| [OpenAI Evals](https://github.com/openai/evals?utm_source=chatgpt.com)                                                       | Benchmarking and custom LLM evaluations                           |
+| [NVIDIA NeMo Evaluator](https://docs.nvidia.com/nemo/microservices/latest/evaluator/metrics/rag.html?utm_source=chatgpt.com) | Enterprise RAG evaluation metrics                                 |
+| [Promptfoo](https://www.promptfoo.dev/?utm_source=chatgpt.com)                                                               | Prompt testing and automated LLM evaluation                       |
+
+
+
+============
+In RAG, Query optimization = improving how a user query is transformed so that retrieval returns the most relevant context.
+
+
+
+3. Provider rate limits
+
+Most LLM providers already enforce:
+
+requests per minute (RPM)
+tokens per minute (TPM)
+
+✅ 1. Concurrency control (VERY important)
+
+Limit how many LLM calls run at the same time:
+
+✅ 2. Per-user LLM quota (optional but powerful)
+
+User can only make 100 LLM calls per hour
+
+✅ 3. Queueing (for heavy workloads)
+
+Instead of rejecting:
+
+Incoming → Queue → Process gradually
+
+✅ 4. Caching (huge win)
+
+If agents repeat similar prompts:
+
+cache responses
+avoid duplicate LLM calls
+
+✅ 5. Timeout + fallback
+
+Don’t let LLM calls hang forever.
+response = await asyncio.wait_for(call_llm(), timeout=10) 
+
+A semaphore is a way to limit how many tasks run at the same time.
+
+semaphore = asyncio.Semaphore(5)
+
+Important behavior
+
+👉 A semaphore does queueing automatically
+
+No requests are dropped ❌
+No errors thrown ❌
+They just pause until a slot is free ✅
+
+
+| Status Code | Meaning               | Retry?      | Notes                                                   |
+| ----------- | --------------------- | ----------- | ------------------------------------------------------- |
+| **429**     | Too Many Requests     | ✅ Yes       | Rate-limiting: respect `Retry-After` header if present. |
+| **500**     | Internal Server Error | ✅ Yes       | Server had an error; usually temporary.                 |
+| **502**     | Bad Gateway           | ✅ Yes       | Likely a temporary network/gateway issue.               |
+| **503**     | Service Unavailable   | ✅ Yes       | Server temporarily unavailable; check `Retry-After`.    |
+| **504**     | Gateway Timeout       | ✅ Yes       | Network timeout; often retryable.                       |
+| **408**     | Request Timeout       | ✅ Sometimes | Could retry with backoff if request might succeed.      |
+
+| Status Code | Meaning              | Retry? | Notes                                                  |
+| ----------- | -------------------- | ------ | ------------------------------------------------------ |
+| **400**     | Bad Request          | ❌ No   | Your request has a problem (syntax, missing fields).   |
+| **401**     | Unauthorized         | ❌ No   | Invalid or missing credentials; retrying won’t fix it. |
+| **403**     | Forbidden            | ❌ No   | You don’t have permission.                             |
+| **404**     | Not Found            | ❌ No   | Endpoint doesn’t exist.                                |
+| **422**     | Unprocessable Entity | ❌ No   | Request is semantically wrong.                         |
+
+
+
+Fallback mechanism:- 
+✅ 1. Retry (with delay) # exponential backoff
+✅ 2. Return cached response
+✅ 3. Fallback to simpler logic
+return "Sorry, I can't process this right now. Try again later."
+
+✅ 4. Use a secondary model/provider
+✅ 5. Queue the request (async processing)
+
+
+What happens if 10 requests come in but semaphore = 5?
+it will take 1st batch of 5 request R1 process it and later it will process another batch
+If 10 calls happen:
+5 start immediately, 5 wait, As each finishes → next starts
+
+Option 2: Add timeout for waiting
+
+
+so do we need queue system or only semaphore can handle it easily if any llm fallback happens or llm requests are pending?
+
+1️⃣ What semaphore can do
+Controls how many requests run concurrently per LLM.
+If a request arrives and semaphore slots are full:
+The request waits until a slot frees up.
+Semaphore does not queue requests persistently; it just blocks them in memory.
+
+✅ Pros: Simple, ensures concurrency limit.
+❌ Cons: Requests pile up in memory → high latency if too many arrive at once.
+
+4️⃣ Recommended pattern
+
+For production-level LLM usage:
+
+Semaphore per LLM worker → controls concurrency
+Queue system → stores pending requests safely
+Timeout + fallback + retry → ensures reliability
+Semaphore: “how many requests can run now”
+Queue: “what requests are waiting to be processed”
+Timeout/fallback: “what to do if a request fails or takes too long”
+
+
+. Assigning a Worker to a Core
+When you assign a worker to a specific core (CPU affinity), it hints to the OS: “run this worker only on this core.”
+The OS then tries to schedule all the worker’s threads on that core.
+Effect: That core becomes mostly dedicated to that worker’s tasks, reducing context switching and improving performance.
+
+✅ So yes, in that sense, assigning a worker to a core effectively reserves it, but:
+
+Other OS tasks can still run on that core if needed.
+It’s not “exclusive” unless you specifically isolate the core at the OS level (e.g., using isolcpus in Linux).
+
+
+                 ┌──────────────┐
+                 │   User/API        │
+                 │  Requests         │
+                 └──────┬───────┘
+                        │
+                        ▼
+               ┌─────────────────┐
+               │ API Middleware        │
+               │  (Rate Limit)         │
+               └──────┬──────────┘
+                        │
+                        ▼
+               ┌─────────────────┐
+               │ Request Queue         │ 
+               │  (FIFO / Priority)    │
+               └──────┬──────────┘
+                        │
+          ┌─────────────┴─────────────┐
+          │                           │
+          ▼                           ▼
+ ┌─────────────────┐         ┌─────────────────┐
+ │   LLM Worker 1  	│         │   LLM Worker 2  │
+ │ Semaphore = 5   	│         │ Semaphore = 5   │
+ │ Timeout + Retry 	│         │ Timeout + Retry │
+ └──────┬──────────┘         └──────┬──────────┘
+        │                             │
+        ▼                             ▼
+        ┌───────────────┐  ┌───────────────┐
+        │ Fallback/Cache     │  │ Fallback/Cache     │
+        │ (if LLM fails)     │  │ (if LLM fails)     │
+        └──────┬────────┘  └──────┬────────┘
+               │                  │
+               └────────┬─────────┘
+                        ▼
+                 ┌──────────────┐
+                 │   Response        │
+                 │ to User/API       │
+                 └──────────────┘
+
+🔹 How it works in sequence
+User sends request
+API Middleware checks rate limit
+Reject if limit exceeded
+Request enters queue
+Stored until a worker is available
+LLM Worker picks request
+Acquires semaphore slot
+Processes request with timeout + retry
+If LLM fails:
+Retry
+Or fallback to cache / default response
+Worker releases semaphore slot
+Response sent back to user
+
+
+
+Queue Method				How it works	Pros				Cons			Suitability
+FIFO Queue (asyncio.Queue)	First-in, first-out	Simple, predictable	No priority handling	✅ Good for small/medium traffic
+Priority Queue (asyncio.PriorityQueue)	Requests have priority values	Handles VIP/urgent requests	Slightly more complex	✅ Recommended if you have priority users
+
+
+Extraction is the process of pulling useful raw content from a source document.
+This step takes messy or structured documents (PDFs, web pages, Word files, logs, etc.) and extracts the actual text or data you care about.
+
+A parser takes the extracted text and structures it into meaningful chunks or fields so the system can understand and retrieve it effectively.
+
+
+| Stage          | Model shown in logs                    | Purpose                                    |
+| -------------- | -------------------------------------- | ------------------------------------------ |
+| Detection      | `ch_PP-OCRv4_det_mobile.onnx`          | Finds text regions in image                |
+| Classification | `ch_ppocr_mobile_v2.0_cls_mobile.onnx` | Detects text orientation (rotate/straight) |
+| Recognition    | `ch_PP-OCRv4_rec_mobile.onnx`          | Converts image → text                      |
+
+
+
+SHARDING
+
+2. Routing to shards
+
+Now the system decides:
+
+Which shards should be searched?
+
+Common strategies:
+
+A. Broadcast (simple but expensive)
+
+Search all shards in parallel, then merge results.
+
+B. Metadata-based routing (smart)
+
+Shards are grouped by:
+
+Topic (finance, medical, legal)
+Language
+Time period
+Source type
+
+Then only relevant shards are queried.
+
+C. Vector partitioning (advanced)
+
+Space is partitioned using clustering (e.g., k-means centroids).
+Query goes only to nearest cluster shards.
+
+
+
+Hybrid routing (best in real systems)
+
+Most production systems combine:
+
+Classifier → narrow down domain
+Vector similarity → pick best shard inside that domain
+
+multi-label queries (“finance + legal”)
+
+
+A StateGraph is essentially a graph-based workflow where each step operates on a shared “state” object.
+
+Nodes = “workers” (functions doing tasks)
+Edges = “roads” (who goes next)
+Conditional edges = “traffic controller” (dynamic routing)
+State = shared memory
+
+Shared state = the single source of truth that every node reads and updates throughout the graph
+
+
+It is architecturally correct but operationally expensive
+
+Ontology = structured knowledge about relationships between things
+paneer → is_a → dairy_product
+paneer → has_nutrient → fat (high)
+paneer → substitute → tofu
+high_fat_diet → restricts → paneer
+diabetes → correlates_with → low_glycemic_food
+
+🧠 So ontology answers:
+What is something?
+What does it contain?
+What is it related to?
+What can replace it?
+What should be avoided with what?
+
+
+Bi-encoder (fast, broad)
+Converts query + documents into vectors
+It is kind which enables similarity search
+
+
+Recall@k → did we retrieve all relevant docs?
+                                              (Mean Reciprocal Rank) → how early the first correct result appears
+nDCG → ranking quality (position matters)
+
+
+I handle noise through cleaning at ingestion, hybrid retrieval for robustness, and cross-encoder re-ranking with thresholds to filter out weakly relevant documents
+
+Boilerplate text: Standardized text that appears across multiple documents, such as disclaimers, headers, footers, copyright notices, terms and conditions, or templated language.
+
+To handle irrelevant or noisy documents, I use a combination of preprocessing, better retrieval, and post-retrieval filtering.
+
+First, during ingestion, I clean and structure the data by removing boilerplate content, duplicates, and low-quality text, and I use intelligent chunking to preserve semantic coherence.
+
+Second, during retrieval, I rely on a hybrid approach—combining keyword-based search like BM25 with dense retrieval using bi-encoder embeddings. This helps balance exact match and semantic match, reducing irrelevant hits.
+
+Third, I apply re-ranking using a cross-encoder, which scores query–document pairs jointly and filters out weak matches from the top-k results.
+
+Finally, I often set similarity thresholds or top-k limits and may add metadata filters (like source type or domain) to further reduce noise before passing context to the generation model.
+
+1. Noisy or meaningless
+
+Random characters or gibberish
+Broken encoding (e.g., â  ,    )
+Keyboard spam like “aaaaaaa” or “123123123”
+
+2. Very short or uninformative
+
+“OK”, “Yes”, “Nice”, “Click here”
+Single-word or fragment sentences without context
+
+3. Boilerplate or repetitive filler
+
+Repeated navigation text (“Home | About | Contact” on every page)
+Cookie banners, disclaimers, login prompts
+
+
+“I prevent hallucinations by improving retrieval quality, limiting and filtering context, strictly constraining generation to retrieved documents, and optionally adding post-generation faithfulness checks.”
+
+
+How would you improve your current RAG system further?
+1. Retrieval upgrades
+Hybrid search (BM25 + embeddings)
+Cross-encoder reranking
+2. Better data representation
+Semantic / structure-aware chunking
+3. Query understanding
+Query rewriting / expansion
+4. System maturity
+Evaluation loop + feedback-driven improvement
+
+
+Prompt Chaining = breaking big tasks into steps which has clear goal like extraction -> Analysis --> Generation
+CoT = Thinking throught the steps like solving maths problems
+
+
+To evaluate the performance of individual agents, 
+I measure them in isolation as well as within the full pipeline using task-specific metrics.
+
+First, I define clear responsibilities for each agent (e.g., retriever, planner, generator, validator), and assign metrics aligned to their role. For example, a retriever is evaluated using Recall@k or Precision@k, while a generator is evaluated on answer correctness and faithfulness.
+
+Second, I create benchmark datasets or test cases where each agent can be evaluated independently. This helps isolate whether errors are coming from a specific agent or from interactions between agents.
+
+Third, I log intermediate outputs at every stage of the pipeline. This allows me to trace failures and understand which agent contributed to an incorrect final result.
+
+Example metrics per agent
+Retriever → Precision@k, Recall@k
+Generator → correctness, faithfulness
+Planner → task completion accuracy
+Validator → error detection rate
+
+
+I evaluate individual agents using role-specific metrics, isolate them with benchmark tests, log intermediate outputs for debugging, and validate their impact through A/B testing within the full pipeline
+
+What are the tradeoffs of multi-agent systems?
+Multi-agent systems improve modularity and capability but introduce tradeoffs in complexity, latency, coordination overhead, and error propagation, so they require careful orchestration and evaluation
+
+
+
+A queue is just a message inbox.
+
+It lives inside RabbitMQ
+It stores messages until someone processes them
+
+A worker is a program that reads messages from the queue and does the work.
+
+
+Precision = “Are the top results good?”
+Recall = “Did Google miss important pages?”
+
+🎯 Case 1: HIGH PRECISION system
+
+The system retrieves only:
+
+Brik Oven ✔
+Farina Pizza ✔
+
+It avoids anything uncertain.
+
+Result:
+Retrieved: 2 restaurants
+Both are correct
+
+✔ Precision = HIGH (no junk results)
+✖ Recall = LOW (missed Domino’s)
+
+What user sees:
+
+“Brik Oven, Farina Pizza”
+
+Good quality, but incomplete list.
+
+🔍 Case 2: HIGH RECALL system
+
+Now system retrieves:
+
+Brik Oven ✔
+Farina Pizza ✔
+Domino’s ✔
+Plus random Italian cafe ❌
+Plus bakery ❌
+Result:
+Retrieved: 5 restaurants
+3 are relevant, 2 are irrelevant
+
+✔ Recall = HIGH (got almost everything)
+✖ Precision = LOWER (noise included)
+
+What user sees (before LLM filtering):
+
+“Brik Oven, Farina Pizza, Domino’s, Bakery X, Cafe Y”
+
+LLM now must filter noise.
+
+
+Both are frameworks for building LLM applications (especially RAG), but they focus on different things:
+
+LangChain = “build the full AI app”
+LlamaIndex = “build the knowledge retrieval system”
+
+
+📊 1. Monitoring LLMs (What is happening right now?)
+
+Monitoring means watching your LLM in production to see how it behaves.
+
+🧠 Think:
+
+“Is my AI healthy and behaving correctly?”
+
+What you track:
+⚙️ System metrics
+Latency (how fast responses are)
+Cost per request
+Token usage
+Error rates
+🧾 Output quality signals
+Hallucination rate (wrong answers)
+Refusal rate (too strict or too loose)
+Toxic or unsafe outputs
+👤 User behavior
+Thumbs up/down
+Regeneration rate (“regenerate answer” clicks)
+Session drop-off (user leaves early)
+Simple example:
+
+A chatbot suddenly becomes slow + users start retrying answers.
+
+👉 Monitoring tells you:
+
+“Something broke after the last prompt update or model change”
+
+🧪 2. Evaluation Pipelines (Is it good or bad?)
+
+Evaluation pipelines are structured tests for your LLM system.
+
+🧠 Think:
+
+“How good is my model on known test cases?”
+
+What it includes:
+📦 Test dataset
+
+Example:
+
+1,000 questions users commonly ask
+🎯 Expected answers (ground truth)
+Correct answers (or reference documents)
+⚙️ Evaluation methods:
+Exact match (for structured outputs)
+LLM-as-judge (another model scores answers)
+Retrieval quality (precision/recall in RAG)
+Factuality checks
+Example (RAG system):
+
+Question:
+
+“What is company refund policy?”
+
+Expected:
+
+“Refund within 30 days with receipt”
+
+Model answer is compared to expected answer.
+
+Output:
+Accuracy: 85%
+Hallucination rate: 10%
+
+👉 This tells you:
+
+“Before deployment, is this version better or worse?”
+
+🔁 3. Feedback Loops (How it gets better over time)
+
+Feedback loops are how the system learns from real users and improves continuously.
+
+🧠 Think:
+
+“Every user interaction makes the system smarter”
+
+Types of feedback:
+👍 Explicit feedback
+Thumbs up/down
+User rating (1–5 stars)
+“Was this helpful?” buttons
+👀 Implicit feedback
+User re-asks question (bad answer)
+User edits query
+User clicks sources
+Session length
+
+
+
+
+
+===================================================================
+
+3. Modern end-to-end flow (voice chatbot example)
+Step-by-step:
+User speaks
+ASR converts speech → text
+LLM receives text + conversation context
+LLM decides:
+answer directly OR
+call tool OR
+retrieve knowledge (RAG)
+Response generated
+Safety filter applied
+TTS converts response to speech
+
+
+Input Layer --> Orchestration Layer --> Tool Layer --> Knowledge Layer --> Generation Layer --> Safety Layer --> Output Layer
+
+ASR (optional)
+LLM Orchestrator
+RAG system (vector DB)
+Tool/API layer
+Safety layer
+TTS (optional)
+
+
+Coroutines: Functions defined with async def that can pause execution with await.
+Event Loop: The orchestrator that runs coroutines and schedules them.
+Tasks: Coroutines wrapped in asyncio.create_task() to run concurrently.
+Awaitables: Anything that can be awaited (coroutines, tasks, or objects with __await__()).
+
+
+
+| Scenario                 | Best Tool                                        |
+| ------------------------ | ------------------------------------------------ |
+| Multiple I/O-bound tasks | `asyncio` or `threading`                         |
+| CPU-heavy tasks          | `multiprocessing`                                |
+| Streaming results        | Generators / Async Generators                    |
+| Mixing I/O & CPU         | Async + ThreadPoolExecutor / ProcessPoolExecutor |
+
+
+def divide(a, b):
+    return a / b
+divide(10, 0)
+
+Dividend	a
+Divisor		b
+ZeroDivisionError: division by zero
+
+
+| Severity                    | Meaning                                                                                    | Example                                                      |
+| --------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
+| **Blocker**                 | Must be fixed immediately. Can cause major failures, security risks, or production issues. | Hardcoded admin credentials, critical security vulnerability |
+| **Critical**                | High likelihood of bugs, crashes, or serious problems.                                     | Possible division by zero, resource leak, null dereference   |
+| **Major**                   | Significant maintainability or reliability issue.                                          | Duplicate code, overly complex function                      |
+| **Minor**                   | Small issue that should be improved but isn't likely to cause failures.                    | Unused variable, unnecessary code                            |
+| **Info** (or Informational) | Suggestions and best practices.                                                            | Naming convention recommendation, code style improvement     |
+
+| Category      | Meaning                     | Example          |
+| ------------- | --------------------------- | ---------------- |
+| Bug           | Code may behave incorrectly | Division by zero |
+| Vulnerability | Security weakness           | SQL Injection    |
+| Code Smell    | Maintainability issue       | Unused variable  |
+
+
+SonarQube classifies issues into Bugs, Vulnerabilities, and Code Smells. Bugs affect correctness, Vulnerabilities affect security, and Code Smells affect maintainability and readability of the code. Code Smells may not break the application today, but they increase technical debt and make future changes more difficult.
+
+Coverage is a metric that tells you how much of your code is tested by automated tests (like unit tests).
+
+It doesn’t mean your code works perfectly.
+It means your tests execute those lines or branches.
+A Quality Gate is a set of conditions that must be met before code can proceed.
+
+Line Coverage (%)=Total lines of code/Lines executed by tests​×100
+
+Quality Profile = "What to Check"
+Quality Gate = "Pass or Fail Criteria"
+
+
+Code
+  ↓
+Quality Profile (rules)
+  ↓
+Issues Found (Bugs, Vulnerabilities, Code Smells)
+  ↓
+Metrics Calculated (Coverage, Duplications, etc.)
+  ↓
+Quality Gate Evaluation
+  ↓
+PASS or FAIL
+
+
+
+Bugs + Code Smells + Vulnerabilities (some) → contribute to technical debt
+Each issue has an estimated “remediation time”
+
+| Issue Type                      | Severity | Time Estimate |
+| ------------------------------- | -------- | ------------- |
+| Bug (division by zero)          | Critical | 30 min        |
+| Code Smell (missing validation) | Major    | 15 min        |
+| Unused variable                 | Minor    | 5 min         |
+
+
+Technical debt in SonarQube represents the estimated time required to fix code quality issues so that the code meets a maintainable standard. It is calculated based on remediation times assigned to each issue type and severity. SonarQube sums up the time for all issues to produce total technical debt, which is then used to compute metrics like the debt ratio.
+
+
+Rerank only by reranker score
+Most common.
+Take the top-K documents from the retriever (e.g., top 20), ignore their retriever scores, and sort them by the reranker’s output.
+
+Combine retriever score + reranker score
+
+Some systems do a weighted sum:
+final_score = alpha * retriever_score + beta * reranker_score
+This can help if the retriever is strong for recall and the reranker is strong for precision.
+
+✅ For most RAG pipelines, just reranker score alone is enough. The key idea is:
+
+Retriever = "catch everything that might be relevant"
+Reranker = "pick the ones that actually answer the question"
+
+
+CRAG (Corrective Retrieval-Augmented Generation) is an improved version of standard RAG where the system does not blindly trust retrieved documents. Instead, it checks the quality of retrieval results and corrects them if they are weak or irrelevant before generating an answer.
+
+CRAG = RAG + “self-check + auto-fix retrieval”
+
+User Query
+   ↓
+Retriever (BM25 / Embeddings)
+   ↓
+Reranker (Cross-encoder)
+   ↓
+Relevance Checker (CRAG step)
+   ↓
+ ┌───────────────┬───────────────┐
+ │ Good context   │ Bad context   │
+ ↓               ↓
+LLM Answer   Query rewrite → Re-retrieve → LLM
+
+
+MATRIX DECOMPOSITION
+
+
+
+"BERT uses encoder layers where every token can attend to every other token."
+
+Example:
+
+I love machine learning
+
+In an encoder:
+
+I        ↔ love
+I        ↔ machine
+I        ↔ learning
+love     ↔ machine
+love     ↔ learning
+machine  ↔ learning
+
+Everyone sees everyone.
+
+GPT Also Has Embeddings
+
+Suppose you ask:
+
+What is LoRA?
+
+GPT first creates vectors:
+
+What  -> 4096 numbers
+is    -> 4096 numbers
+LoRA  -> 4096 numbers
+?     -> 4096 numbers
+
+So internally:
+
+4 × 4096 matrix
+
+already exists.
+
+Then How Does GPT Understand?
+
+After embeddings, GPT applies self-attention.
+
+Imagine:
+
+What is LoRA?
+
+The token "LoRA" might contain information like:
+
+[0.32, -0.91, 0.44, ...]
+
+Initially, this vector doesn't fully capture the sentence meaning.
+
+After Layer 1 attention:
+
+LoRA attends to:
+What
+is
+?
+
+Vector gets updated.
+
+After Layer 2:
+
+LoRA = subject of question
+
+After Layer 10:
+
+User is asking for a definition
+
+After Layer 30:
+
+Need explanatory answer
+
+The vectors become richer and richer.
+
+
+If the task is Understanding Text Only
+
+Examples:
+
+Sentiment analysis
+Classification
+Search ranking
+Entity extraction
+Spam detection
+
+Then BERT is usually better and faster.
+
+Why?
+
+Because BERT sees the entire sentence at once.
+
+
+If the task is Generating Text
+
+Examples:
+
+ChatGPT
+Coding assistant
+Story writing
+Email generation
+
+
+Question answering
+
+Then GPT is much better.
+
+Because GPT is trained specifically to predict:
+
+next token
+
+Example:
+
+The capital of France is
+
+GPT learns:
+
+Paris
+
+and continues generating.
+
+BERT is generally faster and better for text understanding tasks because it uses bidirectional attention and processes the whole input at once. GPT is better for text generation because it is autoregressive and predicts tokens sequentially. Modern AI systems often use encoder models for retrieval and GPT-style decoder models for generation.
+
+
+Self-attention is the Transformer mechanism that computes relationships between tokens using Q, K, and V matrices. Standard attention materializes the full attention matrix, which requires O(N²) memory. FlashAttention is a memory-efficient implementation that computes the same attention result in blocks without storing the full attention matrix. It reduces memory usage, improves GPU utilization, and enables faster training and inference for long-context LLMs while producing mathematically equivalent outputs.
+
+++++++++++++++++++++++++++
+Reciprocal Rank Fusion
+
+RRF (Reciprocal Rank Fusion) is a ranking method often used in RAG (Retrieval-Augmented Generation) systems to combine results from multiple retrieval strategies into a single ranked list.
+
+from langchain.retrievers import EnsembleRetriever
+
+ensemble_retriever = EnsembleRetriever(
+    retrievers=[bm25_retriever, vector_retriever],
+    weights=[0.5, 0.5],
+)
+
+docs = ensemble_retriever.invoke("What is the capital of France?")
