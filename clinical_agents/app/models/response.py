@@ -1,0 +1,1 @@
+# CleaningResponse schema
