@@ -16,6 +16,17 @@ from nutrition_multiagents.api.v1.router import api_router
 app.include_router(api_router, prefix="/api/v1")
 
 
+from nutrition_multiagents.services.messaging.rpc_client import rpc_client
+
+@app.on_event("startup")
+async def startup():
+    await rpc_client.connect("amqp://guest:guest@127.0.0.1:5672/")
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await rpc_client.close()
+
 # Create Redis client
 redis_client = redis.from_url("redis://localhost:6379", decode_responses=True)
 
